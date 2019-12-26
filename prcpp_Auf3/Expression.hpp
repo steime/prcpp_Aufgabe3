@@ -10,11 +10,21 @@ struct Add {
 	}
 };
 
+template<typename Left, typename Right>
+Expression<Left, Add, Right> operator+(const Left& l, const Right& r) {
+	return Expression<Left, Add, Right>(l, r);
+}
+
 struct Subtract {
 	template<typename T> static T apply(T l, T r) {
 		return l - r;
 	}
 };
+
+template<typename Left, typename Right>
+Expression<Left, Subtract, Right> operator-(const Left& l, const Right& r) {
+	return Expression<Left, Subtract, Right>(l, r);
+}
 
 struct Multiply {
 	template<typename T> static T apply(T l, T r) {
@@ -22,13 +32,24 @@ struct Multiply {
 	}
 };
 
+template<typename Left, typename Right>
+Expression<Left, Multiply, Right> operator*(const Left& l, const Right& r) {
+	return Expression<Left, Multiply, Right>(l, r);
+}
+
 struct Divide {
 	template<typename T> static T apply(T l, T r) {
 		return l / r;
 	}
 };
 
-template<typename Left, typename Op, typename Right> class Expression {
+template<typename Left, typename Right>
+Expression<Left, Divide, Right> operator/(const Left& l, const Right& r) {
+	return Expression<Left, Divide, Right>(l, r);
+}
+
+template<typename Left, typename Op, typename Right> 
+class Expression {
 		const Left& m_left;
 		const Right& m_right;
 
@@ -50,7 +71,6 @@ template<typename Left, typename Op, typename Right> class Expression {
 			for (size_t i = 0; i < v.size(); ++i) {
 				if (v[i] != (*this)[i]) res = false;
 			}
-
 			return res;
 		}
 
@@ -68,7 +88,8 @@ template<typename Left, typename Op, typename Right> class Expression {
 		}
 };
 
-template<typename Op, typename Right> class Expression<double, Op, Right> {
+template<typename Op, typename Right> 
+class Expression<double, Op, Right> {
 	const double& m_left;
 	const Right& m_right;
 public:
@@ -80,6 +101,14 @@ public:
 		return Op::template apply<value_type>(m_left, m_right[i]);
 	}
 
+	template<typename E> bool operator==(const E v) const {
+		bool res = v.size() == this->size();
+		for (size_t i = 0; i < v.size(); ++i) {
+			if (v[i] != (*this)[i]) res = false;
+		}
+		return res;
+	}
+
 	friend ostream& operator<<(ostream& os, const Expression& s) {
 		os << "{";
 		for (size_t i = 0; i < s.size(); ++i) {
@@ -92,17 +121,10 @@ public:
 		return os;
 	}
 
-	template<typename E> bool operator==(const E v) const {
-		bool res = v.size() == this->size();
-		for (size_t i = 0; i < v.size(); ++i) {
-			if (v[i] != (*this)[i]) res = false;
-		}
-
-		return res;
-	}
 };
 
-template<typename Left, typename Op> class Expression<Left, Op, double> {
+template<typename Left, typename Op> 
+class Expression<Left, Op, double> {
 	const Left& m_left;
 	const double& m_right;
 public:
@@ -114,6 +136,14 @@ public:
 		return Op::template apply<value_type>(m_left[i], m_right);
 	}
 
+	template<typename E> bool operator==(const E v) const {
+		bool res = v.size() == this->size();
+		for (size_t i = 0; i < v.size(); ++i) {
+			if (v[i] != (*this)[i]) res = false;
+		}
+		return res;
+	}
+
 	friend ostream& operator<<(ostream& os, const Expression& s) {
 		os << "{";
 		for (size_t i = 0; i < s.size(); ++i) {
@@ -126,32 +156,6 @@ public:
 		return os;
 	}
 
-	template<typename E> bool operator==(const E v) const {
-		bool res = v.size() == this->size();
-		for (size_t i = 0; i < v.size(); ++i) {
-			if (v[i] != (*this)[i]) res = false;
-		}
 
-		return res;
-	}
 };
 
-template<typename Left, typename Right>
-Expression<Left, Add, Right> operator+(const Left& l, const Right& r) {
-	return Expression<Left, Add, Right>(l, r);
-}
-
-template<typename Left, typename Right>
-Expression<Left, Subtract, Right> operator-(const Left& l, const Right& r) {
-	return Expression<Left, Subtract, Right>(l, r);
-}
-
-template<typename Left, typename Right>
-Expression<Left, Multiply, Right> operator*(const Left& l, const Right& r) {
-	return Expression<Left, Multiply, Right>(l, r);
-}
-
-template<typename Left, typename Right>
-Expression<Left, Divide, Right> operator/(const Left& l, const Right& r) {
-	return Expression<Left, Divide, Right>(l, r);
-}
