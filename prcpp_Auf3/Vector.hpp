@@ -4,7 +4,8 @@
 
 using namespace std;
 
-template<typename T, size_t S> class Vector : public array<T, S>{
+template<typename T, size_t S> 
+class Vector : public array<T, S>{
 public:
 	Vector(const std::initializer_list<T>& data) {
 		size_t s = __min(data.size(), S);
@@ -12,21 +13,7 @@ public:
 		for (size_t i = 0; i < s; i++) this->at(i) = *it++;
 	}
 
-	Vector() {
-		array<T, S> at;
-	}
-
-	friend ostream& operator<<(ostream& os, const Vector& s) {
-		os << "{";
-		for (size_t i = 0; i < s.size(); ++i) {
-			os << s[i];
-			if (i != s.size() - 1) {
-				os << ", ";
-			}
-		}
-		os << "}";
-		return os;
-	}	
+	Vector() = default;
 
 	template<typename Left, typename Op, typename Right> 
 	Vector& operator=(Expression<Left, Op, Right>& exp) {
@@ -36,13 +23,24 @@ public:
 	}
 
 	template<typename T> 
-	bool operator==(const T v) const {
-		bool res = v.size() == this->size();
-		for (size_t i = 0; i < v.size(); ++i) {
-			if (v[i] != (*this)[i]) res = false;
+	bool operator==(const T vec) const {
+		bool res = vec.size() == this->size();
+		for (size_t i = 0; i < vec.size(); ++i) {
+			if (vec[i] != (*this)[i]) res = false;
 		}
 		return res;
 	}
 
+	friend ostream& operator<<(ostream& os, const Vector& vec) {
+		os << "{";
+		for (size_t i = 0; i < vec.size(); ++i) {
+			os << vec[i];
+			if (i != vec.size() - 1) {
+				os << ", ";
+			}
+		}
+		os << "}";
+		return os;
+	}
 
 };;
