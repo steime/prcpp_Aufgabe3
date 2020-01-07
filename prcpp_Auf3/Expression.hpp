@@ -3,53 +3,54 @@
 
 using namespace std;
 
-template<typename Left, typename Op, typename Right> 
+template<typename Left, typename Op, typename Right>
 class Expression {
-		const Left& m_left;
-		const Right& m_right;
+	const Left& m_left;
+	const Right& m_right;
 
-	public:
-		typedef typename Left::value_type value_type;
+public:
+	typedef typename Left::value_type value_type;
 
-		Expression(const Left& l, const Right& r) : m_left{ l }, m_right{ r } {}
+	Expression(const Left& l, const Right& r) : m_left{ l }, m_right{ r } {}
 
-		size_t size() const { 
-			return m_left.size(); 
+	size_t size() const {
+		return m_left.size();
+	}
+
+	value_type operator[](size_t i) const {
+		return Op::template apply<value_type>(m_left[i], m_right[i]);
+	}
+
+	template<typename E> bool operator==(const E vec) const {
+		bool res = vec.size() == this->size();
+		for (size_t i = 0; i < vec.size(); ++i) {
+			if (vec[i] != (*this)[i]) res = false;
 		}
+		return res;
+	}
 
-		value_type operator[](size_t i) const {
-			return Op::template apply<value_type>(m_left[i], m_right[i]);
-		}
 
-		template<typename E> bool operator==(const E vec) const {
-			bool res = vec.size() == this->size();
-			for (size_t i = 0; i < vec.size(); ++i) {
-				if (vec[i] != (*this)[i]) res = false;
+	friend ostream& operator<<(ostream& os, const Expression& exp) {
+		os << "{";
+		for (size_t i = 0; i < exp.size(); ++i) {
+			os << exp[i];
+			if (i != exp.size() - 1) {
+				os << ", ";
 			}
-			return res;
 		}
-
-
-		friend ostream& operator<<(ostream& os, const Expression& exp) {
-			os << "{";
-			for (size_t i = 0; i < exp.size(); ++i) {
-				os << exp[i];
-				if (i != exp.size() - 1) {
-					os << ", ";
-				}
-			}
-			os << "}";
-			return os;
-		}
+		os << "}";
+		return os;
+	}
 };
 
-template<typename Op, typename Right> 
-class Expression<double, Op, Right> {
-	const double& m_left;
+template<typename Op, typename Right>
+class Expression<typename Right::value_type, Op, Right> {
+	using type = typename Right::value_type;
+	const type& m_left;
 	const Right& m_right;
 public:
 	typedef typename Right::value_type value_type;
-
+	
 	Expression(const double& l, const Right& r) : m_left{ l }, m_right{ r } {}
 
 	size_t size() const { 
@@ -83,9 +84,10 @@ public:
 };
 
 template<typename Left, typename Op> 
-class Expression<Left, Op, double> {
+class Expression<Left, Op, typename Left::value_type> {
+	using type = typename Left::value_type;
 	const Left& m_left;
-	const double& m_right;
+	const type& m_right;
 public:
 	typedef typename Left::value_type value_type;
 

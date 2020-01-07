@@ -9,6 +9,7 @@ int main()
 	Vector<float, 4> D;
 	auto e = (A - B) * (A + B);
 	D = e;
+	D = A + B;
 	cout << D << endl; // [-3,3,9,15]
 	B = { 3, 0, 2, 5 };
 	cout << e << endl; // [-8,4,5,-9]

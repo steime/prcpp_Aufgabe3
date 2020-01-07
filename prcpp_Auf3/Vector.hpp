@@ -16,7 +16,7 @@ public:
 	Vector() = default;
 
 	template<typename Left, typename Op, typename Right> 
-	Vector& operator=(Expression<Left, Op, Right>& exp) {
+	Vector& operator=(const Expression<Left, Op,Right>& exp) {
 		size_t s = __min(exp.size(), S);
 		for (size_t i = 0; i < s; i++) this->at(i) = exp[i];
 		return (*this);
