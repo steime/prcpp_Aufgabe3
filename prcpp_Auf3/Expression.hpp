@@ -42,7 +42,7 @@ public:
 		return os;
 	}
 };
-
+// Specialized Template
 template<typename Op, typename Right>
 class Expression<typename Right::value_type, Op, Right> {
 	using type = typename Right::value_type;
